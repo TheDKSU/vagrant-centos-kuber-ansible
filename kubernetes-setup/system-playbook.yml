@@ -1,0 +1,54 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Disable SELinux
+    command: setenforce 0
+
+  - name: Disable SELinux on system boot
+    selinux:
+      state: disabled
+
+  - name: Disable swap
+    shell: swapoff -a
+
+  - name: Disable swap in fstab
+    mount:
+      name: swap
+      fstype: swap
+      state: absent
+
+  - name: Ensure br_netfilter module is loaded
+    modprobe:
+      name: br_netfilter
+      state: present
+
+  - name: Ensure br_netfiler module loads on start
+    copy:
+      dest: /etc/modules-load.d/k8s.conf
+      content: |
+        br_netfilter
+
+  - name: Ensure net.bridge.bridge-nf-call-ip6tables and net.bridge.bridge-nf-call-iptables is set up after reboot
+    copy:
+      dest: /etc/sysctl.d/10-sysctl.conf
+      content: |
+        net.bridge.bridge-nf-call-iptables=1
+        net.bridge.bridge-nf-call-ip6tables=1
+
+  - name: Ensure net.bridge.bridge-nf-call-iptables is set to 1
+    sysctl:
+      name: net.bridge.bridge-nf-call-iptables
+      value: 1
+      state: present
+      sysctl_set: yes
+
+  - name: Ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+    sysctl:
+      name: net.bridge.bridge-nf-call-ip6tables
+      value: 1
+      state: present
+      sysctl_set: yes
+
+
+

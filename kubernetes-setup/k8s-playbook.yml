@@ -1,0 +1,38 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Add k8s repo
+      yum_repository:
+        name: Kubernetes
+        description: Kubernetes YUM repo
+        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        gpgcheck: yes
+
+    - name: Install kubelet
+      yum:
+        name: kubelet
+        state: present
+        update_cache: yes
+      
+    - name: Install kubeadm
+      yum:
+        name: kubeadm
+        state: present
+        update_cache: yes
+
+    - name: Install kubectl
+      yum: 
+        name: kubectl
+        state: present
+        update_cache: yes
+      
+    - name: Start kubelet
+      service:
+        name: kubelet
+        enabled: yes
+        state: started
+
+    - name: Finish
+      command: echo 'All done. Init the cluster'
