@@ -35,4 +35,4 @@
         state: started
 
     - name: Finish
-      command: echo 'All done. Init the cluster'
+      shell: echo 'All done. Init the cluster'
