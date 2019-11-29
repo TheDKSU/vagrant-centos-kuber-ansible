@@ -33,6 +33,3 @@
         name: kubelet
         enabled: yes
         state: started
-
-    - name: Finish
-      shell: echo 'All done. Init the cluster'
