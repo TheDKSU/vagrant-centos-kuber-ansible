@@ -51,6 +51,19 @@
       path: /etc/systemd/system/docker.service.d
       state: directory
 
+  - name: Checking for line in docker service
+    shell: 'grep "ExecStartPost" /usr/lib/systemd/system/docker.service | wc -l'
+    register: grep_res
+
+  - debug: msg="{{grep_res.stdout}}"
+
+  - name: Add docker service iptables rule
+    lineinfile:
+       path: /usr/lib/systemd/system/docker.service
+       insertafter: '^ExecStart'
+       line: 'ExecStartPost=/usr/sbin/iptables -w -P FORWARD ACCEPT'
+    when: grep_res.stdout == "0"
+
   - name: Start docker
     systemd:
       name: docker
